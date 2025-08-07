@@ -1,0 +1,41 @@
+from setuptools import setup, find_packages
+
+setup(
+    name='cybersecurity_agentic_rag',
+    version='0.1.0',
+    description='A multi-agent RAG system for cybersecurity defense.',
+    author='[Your Name/Team]',
+    author_email='[your.email@example.com]',
+    packages=find_packages(where='src'),
+    package_dir={'': 'src'},
+    install_requires=[
+        # Add dependencies from requirements.txt
+        'torch',
+        'torchvision',
+        'torchaudio',
+        'torch-geometric',
+        'networkx',
+        'langchain',
+        'langchain-community',
+        'langchain-core',
+        'transformers',
+        'stable-baselines3[extra]',
+        'gymnasium',
+        'pandas',
+        'numpy',
+        'scikit-learn',
+        'matplotlib',
+        'seaborn',
+        'plotly',
+        'tqdm',
+        'jupyter',
+        'sphinx',
+        'sphinx_rtd_theme',
+    ],
+    classifiers=[
+        'Programming Language :: Python :: 3',
+        'License :: OSI Approved :: MIT License',
+        'Operating System :: OS Independent',
+    ],
+    python_requires='>=3.8',
+)
