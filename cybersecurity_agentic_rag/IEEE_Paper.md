@@ -1,9 +1,9 @@
 # Forging the Next Generation of Cyber Defense: Novel Research Trajectories in Agentic, Graph-Based, and Optimized RAG Architectures
 
-**Author Name(s)**
-*Department, University/Organization*
-*City, Country*
-*email@example.com*
+**Author Name(Muhammad Mahmoud)**
+*Information System Department, Matrouh University/faculty of computers and Artificial Intelligence*
+*Matrouh, Egypt*
+*m.mahmoud@mau.edu.eg*
 
 ---
 
