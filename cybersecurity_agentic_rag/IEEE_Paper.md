@@ -1,9 +1,9 @@
 # Forging the Next Generation of Cyber Defense: Novel Research Trajectories in Agentic, Graph-Based, and Optimized RAG Architectures
 
-**Author Name(Muhammad Mahmoud)**
-*Information System Department, Matrouh University/faculty of computers and Artificial Intelligence*
-*Matrouh, Egypt*
-*m.mahmoud@mau.edu.eg*
+**Author Name(s)**
+*Department, University/Organization*
+*City, Country*
+*email@example.com*
 
 ---
 
@@ -60,77 +60,88 @@ While the aforementioned areas have shown individual promise, their synthesis re
 
 ### III. METHODOLOGY
 
-Our proposed system is composed of three core layers: an Agentic Coordination layer, a Graph-Based Knowledge layer, and an Optimized RAG layer. The overall architecture is depicted in Figure 1.
+Our proposed framework is a hierarchical intelligent system designed for autonomous cyber defense. It is structured into three interdependent layers: an Agentic Reasoning Layer, a Graph-Augmented Knowledge Layer, and a Policy-Optimized Action Layer. The synergy between these layers enables the system to progress from raw data to contextually-aware, actionable intelligence. The overall architecture is depicted in Figure 1.
 
 **[Figure 1: System Architecture Diagram. A diagram showing the Coordination Agent at the center, interacting with the Cyber Defense Agent and the Knowledge Agent. The Cyber Defense Agent uses the RAG components, and the Knowledge Agent interacts with the Knowledge Graph, which is enhanced by a GNN.]**
 
-**A. Agentic RAG Architecture**
+**A. The Agentic Reasoning Layer**
 
-We employ a multi-agent system to manage the security workflow.
+The core of our system is a multi-agent system (MAS) based on a simplified Belief-Desire-Intention (BDI) model. This allows agents to operate with a degree of autonomy and goal-oriented behavior. The agent team comprises:
 
-1.  **Coordination Agent:** This agent serves as the central orchestrator. It receives incoming security events, delegates tasks to other agents, and makes the final decision on the response plan.
+1.  **Coordination Agent ($A_C$):** This agent acts as the central orchestrator. Its primary goal is to ensure the efficient and effective processing of all security events. It maintains a queue of events and manages the overall workflow, delegating tasks to specialized agents based on a predefined protocol.
 
-2.  **Cyber Defense Agent:** This agent is responsible for threat analysis and response generation. It interacts directly with the RAG components. Upon receiving a task from the coordinator, it formulates queries, processes retrieved information, and generates analytical reports or response plans.
+2.  **Cyber Defense Agent ($A_D$):** This agent is the primary analyst. Its core function is to formulate hypotheses about security events. It interacts with the Retrieval-Augmented Generation (RAG) engine to gather evidence, analyze threat potential, and generate human-readable reports and response plans. Its behavior is driven by the intention to accurately assess the threat level of an event.
 
-3.  **Knowledge Agent:** This agent is the steward of the cybersecurity knowledge graph. It handles all interactions with the graph, including querying for related entities and updating the graph with new information extracted from security events and reports.
+3.  **Knowledge Agent ($A_K$):** This agent is the custodian of the system's structured knowledge. Its function is to maintain and query the Cybersecurity Knowledge Graph (CSKG). It services requests from other agents for graph-based queries and is responsible for assimilating new information into the CSKG, ensuring the knowledge base remains current.
 
-The workflow proceeds as follows: An event triggers the Coordination Agent, which tasks the Cyber Defense Agent with initial analysis. The Cyber Defense Agent queries the RAG system. The results are passed to the Knowledge Agent to extract entities and find deeper connections in the knowledge graph. This enriched context is returned to the Cyber Defense Agent to generate a final, context-aware response plan.
+The inter-agent communication protocol is based on a message-passing scheme where tasks are defined as messages with a specific type (e.g., `ANALYZE_EVENT`, `QUERY_GRAPH`) and a payload.
 
-**B. Graph-Based Optimization**
+**B. The Graph-Augmented Knowledge Layer**
 
-The knowledge base of our system is a dynamic knowledge graph G = (V, E), where V is the set of entities (IPs, CVEs, etc.) and E is the set of relationships.
+The foundation of our system's reasoning capability is the Cybersecurity Knowledge Graph (CSKG), a heterogeneous, directed graph $G = (V, E, \mathcal{T}_V, \mathcal{T}_E)$, where $V$ is the set of entities (nodes), $E$ is the set of relations (edges), and $\mathcal{T}_V$ and $\mathcal{T}_E$ are the sets of entity and relation types, respectively.
 
-1.  **Knowledge Graph Construction:** The graph is populated from multiple sources: structured threat intelligence feeds (e.g., MITRE ATT&CK), unstructured incident reports, and real-time network logs.
+1.  **Graph Neural Network for Node Representation:** To capture the rich topological information within the CSKG, we employ a Graph Convolutional Network (GCN). The GCN learns a d-dimensional embedding vector $h_v \in \mathbb{R}^d$ for each node $v \in V$. The layer-wise propagation rule is defined as:
+    $$ H^{(l+1)} = \sigma(\tilde{D}^{-\frac{1}{2}} \tilde{A} \tilde{D}^{-\frac{1}{2}} H^{(l)} W^{(l)}) $$
+    where $H^{(l)}$ is the matrix of node embeddings at layer $l$, $\tilde{A} = A + I_N$ is the adjacency matrix of the graph $G$ with added self-loops, $\tilde{D}$ is the degree matrix of $\tilde{A}$, $W^{(l)}$ is the trainable weight matrix for layer $l$, and $\sigma$ is a non-linear activation function (e.g., ReLU). These learned embeddings, which encode both node features and local graph structure, are fundamental to our retrieval mechanism.
 
-2.  **Graph Neural Network Integration:** We use a Graph Convolutional Network (GCN) to learn embeddings for each node in the graph. The GCN aggregates information from a node's neighbors, capturing the local graph topology in its embedding. The GCN is trained on a node classification task (e.g., classifying nodes as malicious or benign).
+2.  **Graph-Augmented Retrieval:** A key innovation of our work is the enhancement of the RAG retriever. Traditional retrievers rely on semantic similarity, typically computed as the cosine similarity between a query embedding and document embeddings. Our retriever uses a hybrid similarity score, $S_{hybrid}$, which linearly combines semantic similarity with graph-based structural similarity:
+    $$ S_{hybrid}(q, d) = \alpha \cdot S_{sem}(q, d) + (1 - \alpha) \cdot S_{graph}(q, d) $$
+    where $\alpha \in [0, 1]$ is a hyperparameter balancing the two components.
+    -   $S_{sem}(q, d)$ is the cosine similarity between the embeddings of the query $q$ and document $d$.
+    -   $S_{graph}(q, d)$ is a measure of the structural proximity of the entities in the query and the document within the CSKG. It is computed as the average similarity of their GNN embeddings: $S_{graph}(q, d) = \frac{1}{|E_q||E_d|} \sum_{e_q \in E_q} \sum_{e_d \in E_d} \text{cosine}(h_{e_q}, h_{e_d})$, where $E_q$ and $E_d$ are the sets of entities mentioned in the query and document, respectively.
 
-    The GCN forward pass is defined as:
-    H(l+1) = σ(D̃-1/2 Ã D̃-1/2 H(l) W(l))
-    where Ã = A + I is the adjacency matrix with self-loops, D̃ is the degree matrix of Ã, and W(l) is a trainable weight matrix.
+**C. The Policy-Optimized Action Layer**
 
-3.  **Graph-Enhanced Retrieval:** The learned GNN embeddings are used to augment the RAG's retrieval mechanism. When the retriever searches for documents, it computes a hybrid similarity score that considers both semantic similarity (from traditional text embeddings like BERT) and topological similarity (from the GNN embeddings). This allows the retriever to find documents about entities that are not textually similar but are closely related in the graph (e.g., two different malware families used by the same threat actor).
+To enable the system to adapt its decision-making over time, we formulate the final action selection as a Markov Decision Process (MDP), which we solve using reinforcement learning. The MDP is defined by the tuple $(S, A, P, R, \gamma)$.
 
-**C. Reinforcement Learning Components**
+1.  **State Space ($S$):** The state $s_t \in S$ is a feature vector representing the security event at time $t$. It is composed of: $s_t = [f_{sev}, f_{crit}, f_{conf}, f_{hist}]$, where $f_{sev}$ is the alert's severity, $f_{crit}$ is the criticality of the involved asset, $f_{conf}$ is the detection confidence score, and $f_{hist}$ is a histogram of recent event types.
 
-To enable adaptive decision-making, we frame the response selection process as an RL problem.
+2.  **Action Space ($A$):** The action space is discrete, $A = \{a_0, a_1, a_2\}$, where $a_0$ corresponds to `Ignore`, $a_1$ to `Quarantine Host`, and $a_2$ to `Block IP`.
 
-1.  **Environment:** We model the cybersecurity operations center as a discrete-time environment.
-    -   **State (s):** A vector representing the current security alert, including its severity, the criticality of the affected asset, and the confidence of the detection.
-    -   **Action (a):** A discrete set of actions the agent can take, such as `Ignore`, `Quarantine Host`, or `Block IP`.
-    -   **Reward (r):** The reward function is designed to encourage effective and efficient threat mitigation.
-        r = +10 for a true positive, +2 for a true negative, -20 for a false negative, and -5 for a false positive.
+3.  **Reward Function ($R$):** The reward function $R(s_t, a_t)$ is designed to promote desired behavior. Let $y_t \in \{0, 1\}$ be the ground truth for the event at time $t$ (0 for false positive, 1 for true threat). The reward is:
+    $$ R(s_t, a_t) = \begin{cases} +10 & \text{if } y_t=1 \land a_t \neq a_0 \text{ (True Positive)} \\ +2 & \text{if } y_t=0 \land a_t = a_0 \text{ (True Negative)} \\ -20 & \text{if } y_t=1 \land a_t = a_0 \text{ (False Negative)} \\ -5 & \text{if } y_t=0 \land a_t \neq a_0 \text{ (False Positive)} \end{cases} $$
+    This reward structure heavily penalizes missing real threats while also discouraging disruptive actions on false positives.
 
-2.  **Policy Optimization:** We use the Proximal Policy Optimization (PPO) algorithm to train the RL agent. PPO is well-suited for this task due to its stability and sample efficiency. The agent's policy π(a|s) learns to map a given alert state to the optimal action, maximizing the expected cumulative reward.
+4.  **Policy Optimization:** The goal is to learn an optimal policy $\pi^*(a|s)$ that maximizes the discounted cumulative reward. We employ the Proximal Policy Optimization (PPO) algorithm, which is known for its stability and data efficiency. PPO optimizes a clipped surrogate objective function, which constrains the policy updates to prevent destructively large changes. The policy $\pi_\theta(a|s)$ is represented by a multi-layer perceptron with parameters $\theta$.
 
-**D. Algorithm Descriptions**
+**D. Integrated System Workflow**
 
-The core logic of the system is captured in the following pseudo-code.
+The complete workflow is outlined in Algorithm 1. The process is initiated by a new security event and culminates in a contextually enriched and actionable response plan.
 
-**Algorithm 1: Agentic Event Handling**
+**Algorithm 1: Integrated Agentic Cyber Defense Workflow**
 ```
 Input: Security Event E
-1:  C_agent ← CoordinationAgent
-2:  D_agent ← CyberDefenseAgent
-3:  K_agent ← KnowledgeAgent
-4.
-5:  // Initial Analysis
-6:  initial_report ← D_agent.analyze(E)
-7.
-8:  // Knowledge Enrichment
-9:  entities ← K_agent.extract_entities(initial_report)
-10: enriched_context ← K_agent.query_graph(entities)
-11:
-12: // Final Response Generation
-13: combined_context ← initial_report + enriched_context
-14: final_plan ← D_agent.generate_response(combined_context)
-15:
-16: // Adaptive Action Selection (Optional)
-17: state_vector ← create_state_from_event(E)
-18: optimal_action ← RL_agent.predict(state_vector)
-19: final_plan.add_action(optimal_action)
+Initialize: Agents A_C, A_D, A_K; RAG Engine R; Knowledge Graph G; RL Policy π_θ
+
+1:  // Event Reception and Initial Triage
+2:  A_C receives E
+3:  task_analyze ← create_task(type='ANALYZE', payload=E)
+4.  A_C delegates task_analyze to A_D
+5.
+6:  // Graph-Augmented Retrieval and Analysis
+7:  query ← A_D.formulate_query(E.description)
+8:  retrieved_docs ← R.retrieve_hybrid(query, G)  // Uses hybrid score
+9:  initial_analysis ← R.generate(query, retrieved_docs)
+10:
+11: // Knowledge Enrichment
+12: task_enrich ← create_task(type='ENRICH', payload=initial_analysis)
+13: A_C delegates task_enrich to A_K
+14: entities ← A_K.extract_entities(initial_analysis)
+15: related_info ← A_K.query_graph_for_relations(entities, G)
+16:
+17: // Final Response Generation
+18: enriched_context ← initial_analysis + related_info
+19: final_plan ← A_D.generate_response(enriched_context)
 20:
-21: return final_plan
+21: // Policy-Optimized Action Recommendation
+22: state_vector ← construct_state(E)
+23: recommended_action ← π_θ.predict(state_vector)
+24: final_plan.append_action(recommended_action)
+25:
+26: return final_plan
 ```
+
+This structured and multi-layered methodology ensures that each decision is informed by a rich, contextual understanding derived from multiple, synergistic AI components, justifying its suitability for complex, real-world cybersecurity challenges.
 
 ---
 
